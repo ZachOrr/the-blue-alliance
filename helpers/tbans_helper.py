@@ -2,10 +2,12 @@ import firebase_admin
 import logging
 
 from consts.client_type import ClientType
+from consts.notification_type import NotificationType
 
 from google.appengine.ext import deferred
 
 from models.mobile_client import MobileClient
+from models.subscription import Subscription
 
 
 MAXIMUM_BACKOFF = 32
@@ -26,6 +28,25 @@ class TBANSHelper:
     """
     Helper class for sending push notifications via the FCM HTTPv1 API and sending data payloads to webhooks
     """
+
+    @classmethod
+    def alliance_selection(cls, event):
+        from models.notifications.alliance_selection import AllianceSelectionNotification
+        notification = AllianceSelectionNotification(event)
+
+        users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
+        # Send to FCM clients
+        user_fcm_clients = [MobileClient.clients(user_id, client_types=ClientType.FCM_CLIENTS) for user_id in users]
+        # Flatten our list from list of clients per user to just a list of clients
+        fcm_clients = [client for fcm_clients in user_fcm_clients for client in fcm_clients]
+        if fcm_clients:
+            deferred.defer(
+                cls._send_fcm,
+                fcm_clients,
+                notification,
+                _queue="push-notifications",
+                _url='/_ah/queue/deferred_notification_send'
+            )
 
     @classmethod
     def broadcast(cls, client_types, title, message, url=None, app_version=None):
