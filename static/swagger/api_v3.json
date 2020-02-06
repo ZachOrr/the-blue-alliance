@@ -1462,7 +1462,7 @@
         "tags": [
           "team"
         ],
-        "description": "Gets a list of awards the given team has won.",
+        "description": "Gets a list of awards the given team won.",
         "operationId": "getTeamAwards",
         "parameters": [
           {
@@ -1519,7 +1519,7 @@
         "tags": [
           "team"
         ],
-        "description": "Gets a list of awards the given team has won in a given year.",
+        "description": "Gets a list of awards the given team won in a given year.",
         "operationId": "getTeamAwardsByYear",
         "parameters": [
           {

@@ -2,8 +2,10 @@ import os
 
 from google.appengine.ext.webapp import template
 
+from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.base_controller import CacheableHandler
+from controllers.base_controller import CacheableHandler, LoggedInHandler
+from models.mobile_client import MobileClient
 from template_engine import jinja2_engine
 
 
@@ -63,19 +65,18 @@ class ApiTrustedDocumentationHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
-class WebhookDocumentationHandler(CacheableHandler):
-    CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "webhook_docs"
+class WebhookDocumentationHandler(LoggedInHandler):
 
-    def __init__(self, *args, **kw):
-        super(WebhookDocumentationHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+    def get(self):
+        # Get webhooks for the user
+        clients = MobileClient.clients([self.user_bundle.account.key.id()], client_types=[ClientType.WEBHOOK]) if self.user_bundle.account else []
 
-    def _render(self, *args, **kw):
-        self.template_values['enabled'] = NotificationType.enabled_notifications
-        self.template_values['types'] = NotificationType.types
-        path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
-        return template.render(path, self.template_values)
+        self.template_values.update({
+            'clients': [{'name': client.display_name, 'url': client.messaging_id} for client in clients],
+            'enabled': NotificationType.enabled_notifications,
+            'types': NotificationType.types,
+        })
+        self.response.out.write(jinja2_engine.render('webhookdocs.html', self.template_values))
 
 
 class AddDataHandler(CacheableHandler):
