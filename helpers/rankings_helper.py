@@ -6,7 +6,7 @@ from models.event_details import EventDetails
 
 class RankingsHelper(object):
     SORT_ORDERS = {
-        2020: [2, 3, 4, 5, 6],
+        2020: [2, 3, 4, 5],
         2019: [2, 3, 4, 5, 6],
         2018: [2, 3, 4, 5, 6],
         2017: [2, 3, 4, 5, 6, 7],
