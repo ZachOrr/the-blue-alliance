@@ -1,0 +1,20 @@
+<html>
+  <link rel="stylesheet" href="/css/gameday2.min.css" type="text/css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <body>
+    <div id="content"></div>
+  </body>
+  <script type="text/javascript" src="javascript/gamedaycast.min.js"></script>
+  <script>
+  (function (tos) {
+    window.setInterval(function () {
+      // Calculate time every 60,000 milliseconds (60 seconds)
+      tos = (function (t) {
+        return ((parseInt(t[1]) || 0) + 1) + ':00';
+      })(tos.split(':').reverse());
+      // Collect and send the time to Google Analytics
+      window.pageTracker ? pageTracker._trackEvent('gameday_time', 'Log', tos) : _gaq.push(['_trackEvent', 'gameday_time', 'Log', tos]);
+      }, 60000);
+    })('00');
+  </script>
+</html>

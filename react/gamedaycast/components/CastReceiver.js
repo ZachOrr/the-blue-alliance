@@ -18,7 +18,7 @@ export default class CastReceiver extends React.Component {
     return (
       <div>
         <Script
-          url="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"
+          url="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"
           onCreate={this.handleScriptCreate.bind(this)}
           onError={this.handleScriptError.bind(this)}
           onLoad={this.handleScriptLoad.bind(this)}
@@ -42,9 +42,18 @@ export default class CastReceiver extends React.Component {
 
     console.log("loaded chromecast receiver");
     this.setState({castSdkLoaded: true});
+
     const context = cast.framework.CastReceiverContext.getInstance();
-    let playerElement = document.getElementsByTagName("cast-media-player")[0];
-    playerElement.style.setProperty('--splash-image', 'url("https://github.com/the-blue-alliance/the-blue-alliance-logo/raw/master/pngs/tba_square_icon_deepspace.png")');
+    const playerManager = context.getPlayerManager();
+    playerManager.addEventListener(cast.framework.events.category.REQUEST, event => console.log(event));
+
+    /*
+    // let playerElement = document.getElementsByTagName("cast-media-player")[0];
+    const castDebugLogger = cast.debug.CastDebugLogger.getInstance();
+    castDebugLogger.setEnabled(true);
+    castDebugLogger.showDebugLogs(true);
+    */
+
     context.start();
   }
 }

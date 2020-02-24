@@ -28,6 +28,19 @@ const configs = {
       watch: ['./react/gameday2/**/*.less']
     }
   },
+  gamedaycast: {
+    js: {
+      src: ['./react/gamedaycast/gamedaycast.js'],
+      outputDir: './static/compiled/javascript',
+      outputFile: 'gamedaycast.min.js'
+    },
+    less: {
+      src: ['./react/gamedaycast/gamedaycast.less'],
+      outputDir: './static/compiled/css/',
+      outputFile: 'gamedaycast.min.css',
+      watch: ['./react/gamedaycast/**/*.less']
+    }
+  },
   apidocs: {
     js: {
       src: ['./react/apidocs/apidocs.js'],
@@ -153,6 +166,16 @@ gulp.task('gameday-js-watch', (done) => {
   done();
 });
 
+gulp.task('gamedaycast-js', (done) => {
+  compile(false, configs.gamedaycast);
+  done();
+});
+
+gulp.task('gamedaycast-js-watch', (done) => {
+  compile(true, configs.gamedaycast);
+  done();
+});
+
 gulp.task('liveevent-js', (done) => {
   compile(false, configs.liveevent);
   done();
@@ -184,6 +207,11 @@ gulp.task('gameday-less', (done) => {
   done();
 });
 
+gulp.task('gamedaycast-less', (done) => {
+  compileLess(configs.gamedaycast)
+  done();
+});
+
 gulp.task('eventwizard-less', (done) => {
   compileLess(configs.eventwizard)
   done();
@@ -194,12 +222,19 @@ gulp.task('gameday-less-watch', (done) => {
   done();
 });
 
+gulp.task('gamedaycast-less-watch', (done) => {
+  gulp.watch(configs.gamedaycast.less.watch, gulp.series('gamedaycast-less'));
+  done();
+});
+
 gulp.task('build', gulp.series('gameday-js', 'gameday-less',
+                    'gamedaycast-js', 'gamedaycast-less',
                     'apidocs-js', 'apidocs-less',
                     'eventwizard-js', 'eventwizard-less',
                     'liveevent-js', 'zebramotionworks-js'));
 
 gulp.task('watch', gulp.series('gameday-js-watch', 'gameday-less-watch',
+                    'gamedaycast-js-watch', 'gamedaycast-less-watch',
                     'apidocs-js-watch',
                     'eventwizard-js-watch',
                     'liveevent-js-watch', 'zebramotionworks-js-watch'));

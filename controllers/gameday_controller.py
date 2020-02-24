@@ -12,6 +12,7 @@ from helpers.model_to_dict import ModelToDict
 from helpers.validation_helper import ValidationHelper
 from models.event import Event
 from models.sitevar import Sitevar
+from template_engine import jinja2_engine
 
 from base_controller import CacheableHandler
 
@@ -53,6 +54,37 @@ class Gameday2Controller(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday2.html')
         return template.render(path, self.template_values)
+
+
+class GamedayCastController(CacheableHandler):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "main_gamedaycast"
+
+    def __init__(self, *args, **kw):
+        super(GamedayCastController, self).__init__(*args, **kw)
+        self._cache_expiration = 61
+
+    def _render(self, *args, **kw):
+        special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+        special_webcasts_temp = special_webcasts_future.get_result()
+        if special_webcasts_temp:
+            special_webcasts_temp = special_webcasts_temp.contents.get("webcasts", [])
+        else:
+            special_webcasts_temp = []
+
+        special_webcasts = []
+        for webcast in special_webcasts_temp:
+            toAppend = {}
+            for key, value in webcast.items():
+                toAppend[str(key)] = str(value)
+            special_webcasts.append(toAppend)
+
+        webcasts_json = {
+            'special_webcasts': special_webcasts,
+        }
+
+        self.template_values['webcasts_json'] = json.dumps(webcasts_json)
+        return jinja2_engine.render('gamedaycast.html', self.template_values)
 
 
 class GamedayHandler(CacheableHandler):

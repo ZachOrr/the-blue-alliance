@@ -19,7 +19,7 @@ from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHan
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss, \
       EventNextMatchHandler
 from controllers.event_wizard_controller import EventWizardHandler, ReactEventWizardHandler
-from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
+from controllers.gameday_controller import Gameday2Controller, GamedayCastController, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import AvatarsHandler, TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
     MainLandingHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
@@ -112,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/oldgameday', GamedayHandler, 'gameday', strict_slash=True),
       RedirectRoute(r'/gameday/<alias>', GamedayRedirectHandler, 'gameday-alias', strict_slash=True),
       RedirectRoute(r'/gameday', Gameday2Controller, 'gameday2', strict_slash=True),
+      RedirectRoute(r'/gamedaycast', GamedayCastController, 'gamedaycast', strict_slash=True),
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
       RedirectRoute(r'/hall-of-fame', FIRSTHOFHandler, 'hall-of-fame', strict_slash=True),
       RedirectRoute(r'/insights/<year:[0-9]+>', InsightsDetail, 'insights-detail', strict_slash=True),
