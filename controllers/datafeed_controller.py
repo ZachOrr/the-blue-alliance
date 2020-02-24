@@ -1,3 +1,4 @@
+import itertools
 import logging
 import os
 import datetime
@@ -536,6 +537,48 @@ class EventListGet(webapp.RequestHandler):
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
             self.response.out.write(template.render(path, template_values))
 
+
+class TeamListGet(webapp.RequestHandler):
+    """
+    Fetches team details
+    FMSAPI should be trusted over FIRSTElasticSearch
+    """
+    def get(self, year):
+        year = int(year)
+        fms_df = DatafeedFMSAPI('v2.0')
+
+        page = 1
+        fms_details = fms_df.getTeams(year, page)
+        results = [fms_details[0]]
+
+        while fms_details[1] == True and page < 100:
+            page += 1
+            fms_details = fms_df.getTeams(year, page)
+            results.append(fms_details[0])
+
+        results = list(itertools.chain.from_iterable(results))
+        if results:
+            teams = [t[0] for t in results]
+            district_teams = [d[1] for d in results]
+            robots = [d[2] for d in results]
+        else:
+            teams = []
+            district_teams = []
+            robots = []
+
+        teams = [TeamManipulator.createOrUpdate(team) for team in teams if team]
+        district_teams = [DistrictTeamManipulator.createOrUpdate(district_team) for district_team in district_teams if district_team]
+        robots = [RobotManipulator.createOrUpdate(robot) for robot in robots if robot]
+
+        template_values = {
+            'teams': teams,
+            'district_teams': district_teams,
+            'robots': robots,
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_team_list_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 class DistrictListGet(webapp.RequestHandler):
     """

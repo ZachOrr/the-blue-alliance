@@ -109,6 +109,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/%s/scores/%s/playoff'  # (year, event_short)
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/%s/rankings/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
+            self.FMS_API_TEAMS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams?page=%s'  # (year, page)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_TEAM_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_EVENT_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?eventCode=%s&page=%s'  # (year, eventCode, page)
@@ -336,6 +337,10 @@ class DatafeedFMSAPI(object):
             return result[0]
         else:
             return None
+
+    def getTeams(self, year, page=1):
+        result = self._parse(self.FMS_API_TEAMS_URL_PATTERN % (year, page), FMSAPITeamDetailsParser(year))
+        return result
 
     def getTeamAvatar(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
