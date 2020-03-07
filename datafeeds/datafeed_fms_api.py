@@ -306,10 +306,16 @@ class DatafeedFMSAPI(object):
         qual_details_items = qual_details.items() if qual_details is not None else []
         playoff_details = playoff_details_future.get_result()
         playoff_details_items = playoff_details.items() if playoff_details is not None else []
-        for match_key, match_details in qual_details_items + playoff_details_items:
-            match_key = playoff_matches[1].get(match_key, match_key)
-            if match_key in matches_by_key:
-                matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
+
+        first_playoff_match = None
+        if playoff_matches and len(playoff_matches) >= 1:
+            first_playoff_match = first_playoff_match
+
+        if first_playoff_match:
+            for match_key, match_details in qual_details_items + playoff_details_items:
+                match_key = first_playoff_match.get(match_key, match_key)
+                if match_key in matches_by_key:
+                    matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
 
         return filter(
             lambda m: not FMSAPIHybridScheduleParser.is_blank_match(m),
