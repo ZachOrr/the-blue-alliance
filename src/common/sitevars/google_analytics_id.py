@@ -1,6 +1,6 @@
 import json
 
-from models.sitevar import Sitevar
+from common.sitevar import Sitevar
 
 
 class GoogleAnalyticsID:
