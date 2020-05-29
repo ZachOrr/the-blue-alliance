@@ -1,0 +1,5 @@
+cron:
+- description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
+  url: /tasks-io/event_list
+  schedule: every day 02:00
+  timezone: America/Los_Angeles

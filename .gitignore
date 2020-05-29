@@ -1,7 +1,12 @@
+src/service-account-key.json
+
 __pycache__/
 .pytest_cache/
 .pyre/
 .coverage
+.vagrant/
+.vscode/
+venv/
 coverage.xml
 
 # Compiled/Intermediate Files #
