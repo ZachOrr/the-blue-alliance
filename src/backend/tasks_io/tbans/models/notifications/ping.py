@@ -1,4 +1,4 @@
-from models.notifications.notification import Notification
+from backend.tasks_io.tbans.models.notifications.notification import Notification
 
 
 class PingNotification(Notification):

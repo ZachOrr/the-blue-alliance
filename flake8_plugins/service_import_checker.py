@@ -32,7 +32,7 @@ class ServiceImportChecker:
     def _get_imports(self, node):
         if isinstance(node, ast.Import):
             module = []
-        elif isinstance(node, ast.ImportFrom):
+        elif isinstance(node, ast.ImportFrom) and node.module:
             module = node.module.split(".")
         else:
             return None

@@ -1,13 +1,13 @@
 from firebase_admin import messaging
 from mock import Mock, patch
-import unittest2
+import pytest
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.fcm.platform_priority import PlatformPriority
 from models.fcm.platform_config import PlatformConfig
-from models.notifications.requests.request import Request
+from backend.tasks_io.tbans.models.notifications.requests.request import Request
 from models.notifications.requests.fcm_request import FCMRequest, MAXIMUM_TOKENS
 from sitevars.notifications_enable import NotificationsEnable
 

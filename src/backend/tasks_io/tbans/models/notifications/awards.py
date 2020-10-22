@@ -1,6 +1,6 @@
 from consts.award_type import AwardType
 
-from models.notifications.notification import Notification
+from backend.tasks_io.tbans.models.notifications.notification import Notification
 
 
 class AwardsNotification(Notification):

@@ -1,4 +1,4 @@
-from models.notifications.requests.request import Request
+from backend.tasks_io.tbans.models.notifications.requests.request import Request
 
 
 WEBHOOK_VERSION = 1
@@ -13,7 +13,7 @@ class WebhookRequest(Request):
         secret (string): The secret to calculate the payload checksum with.
     """
 
-    def __init__(self, notification, url, secret):
+    def __init__(self, notification: Notification, url: str, secret: str) -> None:
         """
         Args:
             notification (Notification): The Notification to send.
@@ -25,10 +25,10 @@ class WebhookRequest(Request):
         self.url = url
         self.secret = secret
 
-    def __str__(self):
+    def __str__(self) -> str:
         return 'WebhookRequest(notification={} url={})'.format(str(self.notification), self.url)
 
-    def send(self):
+    def send(self) -> bool:
         """ Attempt to send the notification."""
         # Build the request
         headers = {
@@ -70,7 +70,7 @@ class WebhookRequest(Request):
 
         return valid_url
 
-    def _json_string(self):
+    def _json_string(self) -> str:
         """ JSON string representation of an WebhookRequest object.
 
         JSON for WebhookRequest will look like...
@@ -94,14 +94,14 @@ class WebhookRequest(Request):
         return json.dumps(json_dict, ensure_ascii=True)
 
     # This checksum is insecure and has been deprecated in favor of an HMAC
-    def _generate_webhook_checksum(self, payload):
+    def _generate_webhook_checksum(self, payload) -> str:
         import hashlib
         ch = hashlib.sha1()
         ch.update(self.secret)
         ch.update(payload)
         return ch.hexdigest()
 
-    def _generate_webhook_hmac(self, payload):
+    def _generate_webhook_hmac(self, payload) -> str:
         import hashlib
         import hmac
 

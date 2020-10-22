@@ -5,7 +5,7 @@ import urllib2
 from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
-from models.notifications.requests.request import Request
+from backend.tasks_io.tbans.models.notifications.requests.request import Request
 from models.notifications.requests.webhook_request import WebhookRequest
 
 from tests.mocks.urllib2.mock_http_error import MockHTTPError

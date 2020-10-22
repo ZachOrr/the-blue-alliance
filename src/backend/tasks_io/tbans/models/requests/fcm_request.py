@@ -1,10 +1,6 @@
 from firebase_admin import messaging
 
-from models.notifications.requests.request import Request
-
-# Fix positional argument warnings - can remove once we upgrade to firebase-admin=4.0.0
-from googleapiclient import _helpers
-_helpers.positional_parameters_enforcement = _helpers.POSITIONAL_IGNORE
+from backend.tasks_io.tbans.models.notifications.requests.request import Request
 
 
 MAXIMUM_TOKENS = 500
@@ -18,7 +14,7 @@ class FCMRequest(Request):
         tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None):
+    def __init__(self, app: firebase_admin.App, notification: Notification, tokens: [str] = None) -> None:
         """
         Note:
             Should only supply one delivery method - either token, topic, or connection.
@@ -36,10 +32,10 @@ class FCMRequest(Request):
 
         self.tokens = tokens
 
-    def __str__(self):
+    def __str__(self) -> str:
         return 'FCMRequest(tokens={}, notification={})'.format(self.tokens, str(self.notification))
 
-    def send(self):
+    def send(self) -> messaging.BatchResponse:
         """ Attempt to send the notification.
         Returns:
             messaging.BatchResponse - Batch response object for the messages sent.
@@ -49,7 +45,7 @@ class FCMRequest(Request):
             self.defer_track_notification(response.success_count)
         return response
 
-    def _fcm_message(self):
+    def _fcm_message(self) -> messaging.MulticastMessage:
         platform_config = self.notification.platform_config
 
         from consts.fcm.platform_type import PlatformType

@@ -4,7 +4,7 @@ import unittest2
 from consts.fcm.platform_priority import PlatformPriority
 from consts.fcm.platform_type import PlatformType
 from models.fcm.platform_config import PlatformConfig
-from models.notifications.notification import Notification
+from backend.tasks_io.tbans.models.notifications.notification import Notification
 
 from tests.mocks.notifications.mock_notification import MockNotification
 
