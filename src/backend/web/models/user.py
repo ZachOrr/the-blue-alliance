@@ -138,7 +138,11 @@ class User:
 
     @property
     def is_admin(self) -> bool:
-        return self._session_claims.get("admin", False)
+        return User.claims_is_admin(self._session_claims)
+
+    @staticmethod
+    def claims_is_admin(claims: Dict[str, Any]) -> bool:
+        return claims.get("admin", False)
 
     def register(self, display_name: str) -> None:
         if self._account is None:

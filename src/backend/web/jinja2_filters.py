@@ -1,11 +1,11 @@
 # from email import utils
 # import math
 import re
+import time
 
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.match import Match
 
-# import time
 # import urllib
 #
 # from models.match import Match
@@ -24,6 +24,10 @@ defense_render_names_2016 = {
 
 # def ceil(value):
 #     return int(math.ceil(value))
+
+
+def epoch_time_milisecond_str(epoch_time: int) -> str:
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch_time / 1000))
 
 
 def defense_name(value):
@@ -148,6 +152,7 @@ _filters = {
     "yt_start": yt_start,
     "defense_name": defense_name,
     "match_short": match_short,
+    "epoch_time_milisecond_str": epoch_time_milisecond_str,
 }
 
 

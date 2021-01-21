@@ -14,6 +14,31 @@ _SESSION_KEY = "session"
 # Code from https://firebase.google.com/docs/auth/admin/manage-cookies
 
 
+def grant_admin(uid: str) -> None:
+    _modify_admin_status(uid, True)
+
+
+def revoke_admin(uid: str) -> None:
+    _modify_admin_status(uid, False)
+
+
+def _modify_user_admin_status(uid: str, admin: bool) -> None:
+    current_user = current_user()
+    # Current user *must* be an admin to perform this action
+    if not current_user or not current_user.is_admin:
+        return
+
+    user = auth.get_user(uid)
+    if not user:
+        return
+
+    current_custom_claims = user.custom_claims
+    current_custom_claims = current_custom_claims if current_custom_claims else {}
+
+    current_custom_claims["admin"] = admin
+
+    auth.set_custom_user_claims(uid, current_custom_claims)
+
 def create_session_cookie(id_token: str, expires_in: datetime.timedelta) -> None:
     session_cookie = auth.create_session_cookie(
         id_token, expires_in=expires_in, app=app()

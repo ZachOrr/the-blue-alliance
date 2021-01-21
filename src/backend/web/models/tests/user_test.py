@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable, Dict
 
 import pytest
 from google.cloud import ndb
@@ -326,6 +326,11 @@ def test_is_admin_false() -> None:
 def test_is_admin() -> None:
     user = User(session_claims={"admin": True})
     assert user.is_admin
+
+
+@pytest.mark.parametrize("claims, expected", [({}, False), ({"admin": False}, False), ({"admin": True}, True)])
+def test_claims_is_admin(claims: Dict[str, Any], expected: bool) -> None:
+    assert User.claims_is_admin(claims) == expected
 
 
 def test_register_none() -> None:

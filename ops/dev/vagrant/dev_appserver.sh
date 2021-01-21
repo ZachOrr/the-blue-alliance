@@ -106,4 +106,5 @@ dev_appserver.py \
     --env_var TASKS_MODE="$tasks_mode" \
     --env_var FLASK_RESPONE_CACHE_ENABLED="$flask_response_cache_enabled" \
     --dev_appserver_log_level=$log_level \
+    --log_level=$log_level \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml
