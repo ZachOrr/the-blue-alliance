@@ -7,8 +7,11 @@ from google.appengine.ext import ndb
 from consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
-from models.event import Event
-from models.match import Match
+# from models.event import Event
+# from models.match import Match
+from backend.common.models.event import Event
+from backend.common.models.match import Match
+
 
 QF_SF_MAP = {
     1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3
@@ -20,8 +23,8 @@ QF_SF_MAP = {
 }
 
 LAST_LEVEL = {
-    'sf': 'qf',
-    'f': 'sf'
+    "sf": "qf",
+    "f": "sf"
 }
 
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
@@ -29,31 +32,29 @@ TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
 class FMSAPIHybridScheduleParser(object):
 
-    def __init__(self, year, event_short):
+    def __init__(self, year: int, event_short: str):
         self.year = year
         self.event_short = event_short
 
     @classmethod
-    def is_blank_match(cls, match):
+    def is_blank_match(cls, match: Match) -> bool:
         """
         Detect junk playoff matches like in 2017scmb
         """
-        if match.comp_level == 'qm' or not match.score_breakdown:
+        if match.comp_level == "qm" or not match.score_breakdown:
             return False
-        for color in ['red', 'blue']:
+        for color in ["red", "blue"]:
             if match.alliances[color]['score'] != 0:
                 return False
             for value in match.score_breakdown[color].values():
-                if value and value not in  {'Unknown', 'None'}:  # Nonzero, False, blank, None, etc.
+                if value and value not in {"Unknown", "None"}:  # Nonzero, False, blank, None, etc.
                     return False
         return True
 
-    def parse(self, response):
+    def parse(self, response: Dict[str, Any]):
         import pytz
 
-        matches = response['Schedule']
-
-        event_key = '{}{}'.format(self.year, self.event_short)
+        event_key = "{}{}".format(self.year, self.event_short)
         event = Event.get_by_id(event_key)
         if event.timezone_id:
             event_tz = pytz.timezone(event.timezone_id)
@@ -61,19 +62,29 @@ class FMSAPIHybridScheduleParser(object):
             logging.warning("Event {} has no timezone! Match times may be wrong.".format(event_key))
             event_tz = None
 
+        matches = response["Schedule"]
         match_identifiers = []
+
         for match in matches:
-            if 'tournamentLevel' in match:  # 2016+
-                level = match['tournamentLevel']
+            if "tournamentLevel" in match:  # 2016+
+                level = match["tournamentLevel"]
             else:  # 2015
-                level = match['level']
-            comp_level = PlayoffType.get_comp_level(event.playoff_type, level, match['matchNumber'])
-            set_number, match_number = PlayoffType.get_set_match_number(event.playoff_type, comp_level, match['matchNumber'])
+                level = match["level"]
+            comp_level = PlayoffType.get_comp_level(
+                event.playoff_type,
+                level, match["matchNumber"]
+            )
+            set_number, match_number = PlayoffType.get_set_match_number(
+                event.playoff_type,
+                comp_level,
+                match["matchNumber"]
+            )
             key_name = Match.renderKeyName(
                 event_key,
                 comp_level,
                 set_number,
-                match_number)
+                match_number
+            )
             match_identifiers.append((key_name, comp_level, set_number, match_number))
 
         # Prefetch matches for tiebreaker checking
@@ -90,61 +101,61 @@ class FMSAPIHybridScheduleParser(object):
             blue_dqs = []
             team_key_names = []
             null_team = False
-            sorted_teams = sorted(match.get('teams', match.get('Teams', [])), key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
+            sorted_teams = sorted(match.get("teams", match.get("Teams", [])), key=lambda team: team["station"])  # Sort by station to ensure correct ordering. Kind of hacky.
             for team in sorted_teams:
-                if team['teamNumber'] is None:
+                if team["teamNumber"] is None:
                     null_team = True
-                team_key = 'frc{}'.format(team['teamNumber'])
+                team_key = "frc{}".format(team["teamNumber"])
                 team_key_names.append(team_key)
-                if 'Red' in team['station']:
+                if "Red" in team["station"]:
                     red_teams.append(team_key)
-                    if team['surrogate']:
+                    if team["surrogate"]:
                         red_surrogates.append(team_key)
-                    if team['dq']:
+                    if team["dq"]:
                         red_dqs.append(team_key)
-                elif 'Blue' in team['station']:
+                elif "Blue" in team["station"]:
                     blue_teams.append(team_key)
-                    if team['surrogate']:
+                    if team["surrogate"]:
                         blue_surrogates.append(team_key)
-                    if team['dq']:
+                    if team["dq"]:
                         blue_dqs.append(team_key)
 
-            if null_team and match['scoreRedFinal'] is None and match['scoreBlueFinal'] is None:
+            if null_team and match["scoreRedFinal"] is None and match["scoreBlueFinal"] is None:
                 continue
 
             alliances = {
-                'red': {
-                    'teams': red_teams,
-                    'surrogates': red_surrogates,
-                    'dqs': red_dqs,
-                    'score': match['scoreRedFinal']
+                "red": {
+                    "teams": red_teams,
+                    "surrogates": red_surrogates,
+                    "dqs": red_dqs,
+                    "score": match["scoreRedFinal"]
                 },
-                'blue': {
-                    'teams': blue_teams,
-                    'surrogates': blue_surrogates,
-                    'dqs': blue_dqs,
-                    'score': match['scoreBlueFinal']
+                "blue": {
+                    "teams": blue_teams,
+                    "surrogates": blue_surrogates,
+                    "dqs": blue_dqs,
+                    "score": match["scoreBlueFinal"]
                 },
             }
 
-            if not match['startTime']:  # no startTime means it's an unneeded rubber match
+            if not match["startTime"]:  # no startTime means it's an unneeded rubber match
                 continue
 
-            time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
+            time = datetime.datetime.strptime(match["startTime"].split(".")[0], TIME_PATTERN)
             if event_tz is not None:
                 time = time - event_tz.utcoffset(time)
 
-            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
+            actual_time_raw = match["actualStartTime"] if "actualStartTime" in match else None
             actual_time = None
             if actual_time_raw is not None:
-                actual_time = datetime.datetime.strptime(actual_time_raw.split('.')[0], TIME_PATTERN)
+                actual_time = datetime.datetime.strptime(actual_time_raw.split(".")[0], TIME_PATTERN)
                 if event_tz is not None:
                     actual_time = actual_time - event_tz.utcoffset(actual_time)
 
-            post_result_time_raw = match.get('postResultTime')
+            post_result_time_raw = match.get("postResultTime")
             post_result_time = None
             if post_result_time_raw is not None:
-                post_result_time = datetime.datetime.strptime(post_result_time_raw.split('.')[0], TIME_PATTERN)
+                post_result_time = datetime.datetime.strptime(post_result_time_raw.split(".")[0], TIME_PATTERN)
                 if event_tz is not None:
                     post_result_time = post_result_time - event_tz.utcoffset(post_result_time)
 
@@ -246,7 +257,7 @@ class FMSAPIMatchDetailsParser(object):
         self.year = year
         self.event_short = event_short
 
-    def parse(self, response):
+    def parse(self, response: Dict[str, Any]):
         matches = response['MatchScores']
 
         event_key = '{}{}'.format(self.year, self.event_short)
