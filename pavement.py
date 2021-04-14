@@ -117,7 +117,7 @@ def make():
     javascript()
     gulp()
     less()
-    jinja2()
+    # jinja2()
 
     build_time = time.ctime()
     travis_job = os.environ.get('GITHUB_RUN_ID', os.environ.get('TRAVIS_BUILD_ID', ''))

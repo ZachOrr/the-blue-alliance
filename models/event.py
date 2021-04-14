@@ -8,7 +8,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
 from models.district import District
-from models.event_details import EventDetails
 from models.location import Location
 
 
@@ -108,6 +107,8 @@ class Event(ndb.Model):
 
     @property
     def details(self):
+        from models.event_details import EventDetails
+
         if self._details is None:
             self._details = EventDetails.get_by_id(self.key.id())
         elif type(self._details) == Future:
@@ -115,6 +116,8 @@ class Event(ndb.Model):
         return self._details
 
     def prep_details(self):
+        from models.event_details import EventDetails
+
         if self._details is None:
             self._details = ndb.Key(EventDetails, self.key.id()).get_async()
 
@@ -271,10 +274,6 @@ class Event(ndb.Model):
         if self.year == 2016:
             return "Week {}".format(0.5 if self.week == 0 else self.week)
         return "Week {}".format(self.week + 1)
-
-    @property
-    def is_season_event(self):
-        return self.event_type_enum in EventType.SEASON_EVENT_TYPES
 
     @ndb.tasklet
     def get_teams_async(self):

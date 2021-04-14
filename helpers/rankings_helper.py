@@ -23,6 +23,19 @@ class RankingsHelper(object):
     }
 
     SORT_ORDER_INFO = {
+        2021: [
+            {'name': 'Overall Score',
+             'precision': 2},
+            {'name': 'Galactic Search',
+             'precision': 2},
+            {'name': 'Auto-Nav',
+             'precision': 2},
+            {'name': 'Hyperdrive',
+             'precision': 2},
+            {'name': 'Interstellar Accuracy',
+             'precision': 2},
+            {'name': 'Power Port',
+             'precision': 2}],
         2020: [
             {'name': 'Ranking Score',
              'precision': 2},
@@ -202,8 +215,11 @@ class RankingsHelper(object):
     @classmethod
     def get_sort_order_info(cls, event_details):
         year = event_details.year
-        if event_details.key.id() == '2015mttd':  # 2015mttd played the 2014 game
+        if event_details.key_name() == '2015mttd':  # 2015mttd played the 2014 game
             year = 2014
+        # 2021 offseason events played the 2020 game
+        if event_details.year == 2021 and event_details.event.is_offseason:
+            year = 2020
         return cls.SORT_ORDER_INFO.get(year)
 
     @classmethod
@@ -215,7 +231,7 @@ class RankingsHelper(object):
             return None
 
         year = event_details.year
-        if event_details.key.id() == '2015mttd':  # 2015mttd played the 2014 game
+        if event_details.key_name() == '2015mttd':  # 2015mttd played the 2014 game
             year = 2014
 
         # Look up indexes

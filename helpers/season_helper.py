@@ -72,7 +72,7 @@ class SeasonHelper:
         earliest_start = None
         timezone = None
         for event in events:
-            if event.is_season_event and (earliest_start is None or event.start_date < earliest_start):
+            if event.is_in_season and (earliest_start is None or event.start_date < earliest_start):
                 earliest_start = event.start_date
                 timezone = event.timezone_id
         return earliest_start

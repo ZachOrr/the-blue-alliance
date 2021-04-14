@@ -38,6 +38,12 @@ class EventDetails(ndb.Model):
         return int(self.key.id()[:4])
 
     @property
+    def event(self):
+        from models.event import Event
+
+        return Event.get_by_id(self.key_name())
+
+    @property
     def renderable_rankings(self):
         from helpers.rankings_helper import RankingsHelper
 

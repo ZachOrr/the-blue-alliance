@@ -1,0 +1,10 @@
+{
+    "datastore_mode": "local",
+    "redis_cache_url": "redis://localhost:6379",
+    "tasks_mode": "local",
+    "log_level": "warning",
+    "tba_log_level": "warning",
+    "ndb_log_level": "warning",
+    "flask_response_cache_enabled": "false",
+    "google_application_credentials": "ops/dev/keys/tba-dev-zach-firebase-adminsdk-gyg11-1bba128bf3.json"
+}
