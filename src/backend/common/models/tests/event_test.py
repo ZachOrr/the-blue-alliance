@@ -188,11 +188,12 @@ def test_past_future_start_end_today(
     "year, event_type, official, week, week_output, week_str",
     [
         # Don't forget that weeks are zero indexed :)
-        (2020, EventType.REGIONAL, True, 2, 2, "Week 3"),
         (2016, EventType.REGIONAL, True, 0, 0, "Week 0.5"),
         (2016, EventType.REGIONAL, True, 1, 1, "Week 1"),
-        (2020, EventType.OFFSEASON, False, 2, None, None),
+        (2020, EventType.REGIONAL, True, 2, 2, "Week 3"),
         (2020, EventType.REGIONAL, False, 2, None, None),
+        (2020, EventType.OFFSEASON, False, 2, None, None),
+        (2021, EventType.REGIONAL, True, 0, 0, None),
     ],
 )
 def test_week(

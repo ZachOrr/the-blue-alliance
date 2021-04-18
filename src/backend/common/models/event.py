@@ -395,6 +395,9 @@ class Event(CachedModel):
             return None
         if self.year == 2016:
             return "Week {}".format(0.5 if self.week == 0 else self.week)
+        if self.year == 2021:
+            # 2021 was all remote events - which don't have human-readable weeks
+            return None
         return "Week {}".format(none_throws(self.week) + 1)
 
     @ndb.tasklet
