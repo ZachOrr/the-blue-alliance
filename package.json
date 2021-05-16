@@ -1,44 +1,47 @@
 {
   "name": "tba-react",
   "version": "0.0.0",
+  "engines": {
+    "node": "^14"
+  },
   "dependencies": {
     "classnames": "^2.3.1",
     "element-resize-event": "^3.0.3",
-    "firebase": "^8.4.3",
+    "firebase": "^8.6.0",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
     "less-loader": "^8.1.1",
     "material-ui": "^0.20.2",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "prop-types": "^15.5.10",
     "query-string": "^7.0.0",
     "react": "^17.0.2",
     "react-addons-transition-group": "^15.4.1",
-    "react-bootstrap": "^0.32.4",
+    "react-bootstrap": "^1.6.0",
     "react-bootstrap-dialog": "^0.13.0",
-    "react-bootstrap-typeahead": "^3.4.7",
+    "react-bootstrap-typeahead": "^5.1.4",
     "react-countup": "^4.3.3",
     "react-dom": "^17.0.2",
     "react-event-listener": "^0.6.6",
     "react-file-input": "^0.2.5",
     "react-ga": "^3.3.0",
-    "react-redux": "^5.1.2",
-    "react-select": "^2.4.4",
+    "react-redux": "^7.2.4",
+    "react-select": "^4.3.1",
     "redux": "^4.1.0",
     "redux-thunk": "^2.0.1",
     "reselect": "^4.0.0",
     "swagger-ui": "^3.48.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.0",
+    "@babel/core": "^7.14.2",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/preset-env": "^7.14.0",
+    "@babel/preset-env": "^7.14.1",
     "@babel/preset-react": "^7.13.13",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.3",
     "css-loader": "^5.2.4",
-    "eslint": "^7.25.0",
+    "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
@@ -47,8 +50,8 @@
     "md5": "^2.3.0",
     "process": "^0.11.10",
     "style-loader": "^2.0.0",
-    "webpack": "^5.36.1",
-    "webpack-cli": "^4.6.0"
+    "webpack": "^5.37.0",
+    "webpack-cli": "^4.7.0"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --watch",
@@ -68,6 +71,8 @@
       "<rootDir>/node_modules/react-test-renderer/",
       "<rootDir>/node_modules/react-addons-test-utils/",
       "<rootDir>/node_modules/enzyme/"
-    ]
+    ],
+    "coverageDirectory": "./.node_coverage/",
+    "collectCoverage": true
   }
 }
