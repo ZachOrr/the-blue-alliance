@@ -14,7 +14,7 @@ pytest-cov
 pytest-custom_exit_code
 pytest-testmon
 PyYAML==6.0
-redis==3.5.3
+redis==4.0.2
 hiredis==2.0.0
 requests-mock
 shellcheck-py
