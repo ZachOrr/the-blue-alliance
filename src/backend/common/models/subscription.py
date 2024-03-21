@@ -48,7 +48,9 @@ class Subscription(MyTBAModel):
         subscriptions = yield Subscription.query(
             Subscription.model_key.IN([event.key_name, "{}*".format(event.year)]),
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.EVENT
+            Subscription.model_type == ModelType.EVENT,
+            projection=[Subscription.user_id],
+            group_by=[Subscription.user_id],
         ).fetch_async()
         return subscriptions
 
@@ -70,7 +72,9 @@ class Subscription(MyTBAModel):
         subscription = yield Subscription.query(
             Subscription.model_key == team.key_name,
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.TEAM
+            Subscription.model_type == ModelType.TEAM,
+            projection=[Subscription.user_id],
+            group_by=[Subscription.user_id],
         ).fetch_async()
         return subscription
 
@@ -91,6 +95,8 @@ class Subscription(MyTBAModel):
         subscriptions = yield Subscription.query(
             Subscription.model_key == match.key_name,
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.MATCH
+            Subscription.model_type == ModelType.MATCH,
+            projection=[Subscription.user_id],
+            group_by=[Subscription.user_id],
         ).fetch_async()
         return subscriptions

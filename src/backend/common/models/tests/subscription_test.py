@@ -103,8 +103,9 @@ def test_subscriptions_for_event_year_key():
     subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 2
-    assert one in subscriptions
-    assert two in subscriptions
+    user_ids = [sub.user_id for sub in subscriptions]
+    assert 'user_id_1' in user_ids
+    assert 'user_id_2' in user_ids
 
 
 def test_subscriptions_for_event_model_type():
@@ -138,30 +139,30 @@ def test_subscriptions_for_event_model_type():
     assert subscriptions[0].user_id == "user_id_1"
 
 
-# def test_subscriptions_for_event_distinct():
-#     event = EventTestCreator.create_future_event()
-#     # Make sure we filter for duplicates
-#     one = Subscription(
-#         parent=ndb.Key(Account, 'user_id_1'),
-#         user_id='user_id_1',
-#         model_key=event.key_name,
-#         model_type=ModelType.EVENT,
-#         notification_types=[NotificationType.UPCOMING_MATCH]
-#     )
-#     one.put()
-#     two = Subscription(
-#         parent=ndb.Key(Account, 'user_id_1'),
-#         user_id='user_id_1',
-#         model_key=f'{event.year}*',
-#         model_type=ModelType.EVENT,
-#         notification_types=[NotificationType.UPCOMING_MATCH]
-#     )
-#     two.put()
+def test_subscriptions_for_event_distinct():
+    event = EventTestCreator.create_future_event()
+    # Make sure we filter for duplicates
+    one = Subscription(
+        parent=ndb.Key(Account, 'user_id_1'),
+        user_id='user_id_1',
+        model_key=event.key_name,
+        model_type=ModelType.EVENT,
+        notification_types=[NotificationType.UPCOMING_MATCH]
+    )
+    one.put()
+    two = Subscription(
+        parent=ndb.Key(Account, 'user_id_1'),
+        user_id='user_id_1',
+        model_key=f'{event.year}*',
+        model_type=ModelType.EVENT,
+        notification_types=[NotificationType.UPCOMING_MATCH]
+    )
+    two.put()
 
-#     subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
-#     subscriptions = subscriptions_future.get_result()
-#     assert len(subscriptions) == 1
-#     assert subscriptions[0].user_id == "user_id_1"
+    subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
+    subscriptions = subscriptions_future.get_result()
+    assert len(subscriptions) == 1
+    assert subscriptions[0].user_id == "user_id_1"
 
 
 def test_subscriptions_for_team_key():
@@ -192,8 +193,9 @@ def test_subscriptions_for_team_key():
     subscriptions_future = Subscription.subscriptions_for_team(team, NotificationType.UPCOMING_MATCH)
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 2
-    assert one in subscriptions
-    assert two in subscriptions
+    user_ids = [sub.user_id for sub in subscriptions]
+    assert 'user_id_1' in user_ids
+    assert 'user_id_2' in user_ids
 
 
 def test_subscriptions_for_team_model_type():
@@ -223,9 +225,10 @@ def test_subscriptions_for_team_model_type():
     )
     two.put()
 
-    subscriptions = Subscription.subscriptions_for_team(team, NotificationType.UPCOMING_MATCH)
-    assert subscriptions.get_result() == [two]
-
+    subscriptions_future = Subscription.subscriptions_for_team(team, NotificationType.UPCOMING_MATCH)
+    subscriptions = subscriptions_future.get_result()
+    assert len(subscriptions) == 1
+    assert subscriptions[0].user_id ==  'user_id_2'
 
 # def test_subscriptions_for_team_distinct():
 #     team = Team(
@@ -288,8 +291,9 @@ def test_subscriptions_for_match_key():
     subscriptions_future = Subscription.subscriptions_for_match(match, NotificationType.UPCOMING_MATCH)
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 2
-    assert one in subscriptions
-    assert two in subscriptions
+    user_ids = [sub.user_id for sub in subscriptions]
+    assert 'user_id_1' in user_ids
+    assert 'user_id_2' in user_ids
 
 
 def test_subscriptions_for_match_model_type():
@@ -312,8 +316,10 @@ def test_subscriptions_for_match_model_type():
     )
     two.put()
 
-    subscriptions = Subscription.subscriptions_for_match(match, NotificationType.UPCOMING_MATCH)
-    assert subscriptions.get_result() == [one]
+    subscriptions_future = Subscription.subscriptions_for_match(match, NotificationType.UPCOMING_MATCH)
+    subscriptions = subscriptions_future.get_result()
+    assert len(subscriptions) == 1
+    assert subscriptions[0].user_id ==  'user_id_1'
 
 
 # def test_subscriptions_for_match_distinct():
