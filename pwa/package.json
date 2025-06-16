@@ -100,7 +100,7 @@
     "eslint-plugin-react-hooks": "6.0.0-rc.1",
     "globals": "16.2.0",
     "prettier": "3.5.3",
-    "prettier-plugin-classnames": "0.7.8",
+    "prettier-plugin-classnames": "0.7.9",
     "prettier-plugin-merge": "0.7.4",
     "prettier-plugin-tailwindcss": "0.6.12",
     "tailwindcss": "4.1.10",
