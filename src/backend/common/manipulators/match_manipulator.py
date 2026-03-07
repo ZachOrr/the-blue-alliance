@@ -19,6 +19,15 @@ if TYPE_CHECKING:
     from backend.common.models.event import Event
 
 
+# When a match score arrives without a score breakdown, delay the
+# notification so the breakdown has a chance to land in Datastore before
+# TBANSHelper.match_score re-fetches the match. Scores and breakdowns are
+# fetched concurrently in a single cron cycle (every 1 minute), so a missing
+# breakdown typically means the match_scores API call failed and the data
+# will arrive on the next cron run. 60s aligns with that polling interval.
+MATCH_SCORE_DELAY_SECONDS = 60
+
+
 class MatchManipulator(ManipulatorBase[Match]):
     """
     Handle Match database writes.
@@ -96,6 +105,15 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
+                    # If we don't have score breakdown data yet, delay the
+                    # notification briefly so the breakdown has time to arrive
+                    # (scores and breakdowns come from separate FRC API calls
+                    # that normally land in the same cron cycle, but sometimes
+                    # the breakdown is a few seconds behind).
+                    countdown = (
+                        0 if match.score_breakdown else MATCH_SCORE_DELAY_SECONDS
+                    )
+
                     # Catch TaskAlreadyExistsError + TombstonedTaskError
                     try:
                         defer_safe(
@@ -105,6 +123,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                             _target="py3-tasks-io",
                             _queue="push-notifications",
                             _url="/_ah/queue/deferred_notification_send",
+                            _countdown=countdown,
                         )
                         # Update score sent boolean on Match object to make sure we only send a notification once
                         match.push_sent = True

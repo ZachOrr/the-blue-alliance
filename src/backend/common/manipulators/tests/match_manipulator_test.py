@@ -405,3 +405,79 @@ def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> No
         name="2012ct_qm1_match_score", queue_names="push-notifications"
     )
     assert len(tasks) == 0
+
+
+def test_postUpdateHook_notification_no_countdown_with_breakdown(
+    ndb_context, taskqueue_stub
+) -> None:
+    """When a match has score breakdown, the notification should be sent immediately (countdown=0)."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json='{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}',
+        score_breakdown_json=json.dumps(
+            {
+                "red": {"auto": 20, "teleop": 54},
+                "blue": {"auto": 30, "teleop": 27},
+            }
+        ),
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        with patch.object(Event, "now", return_value=True):
+            run_from_task(task)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    assert len(tasks) == 1
+    task = tasks[0]
+    assert task.name == "2012ct_qm1_match_score"
+
+
+def test_postUpdateHook_notification_countdown_without_breakdown(
+    ndb_context, taskqueue_stub
+) -> None:
+    """When a match has no score breakdown, the notification should be delayed."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json='{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}',
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        with patch.object(Event, "now", return_value=True):
+            run_from_task(task)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    assert len(tasks) == 1
+    task = tasks[0]
+    assert task.name == "2012ct_qm1_match_score"
+
+    # push_sent should still be set immediately (before countdown fires)
+    test_match = none_throws(Match.get_by_id("2012ct_qm1"))
+    assert test_match.push_sent

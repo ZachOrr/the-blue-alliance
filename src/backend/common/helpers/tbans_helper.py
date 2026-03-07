@@ -4,6 +4,7 @@ import time
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
+from pyre_extensions import none_throws
 
 from backend.common.consts.client_type import (
     ClientType,
@@ -249,6 +250,13 @@ class TBANSHelper:
 
     @classmethod
     def match_score(cls, match: Match, user_id: str | None = None) -> None:
+        # Re-fetch the match from Datastore so we always use the latest data.
+        # When the notification is deferred with a countdown (to wait for
+        # score_breakdown), the pickled match may be stale.
+        fresh_match = Match.get_by_id(none_throws(match.key.id()))
+        if fresh_match is not None:
+            match = fresh_match
+
         event = match.event.get()
 
         # Send to Event subscribers

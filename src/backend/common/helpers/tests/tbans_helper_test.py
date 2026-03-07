@@ -473,6 +473,39 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper.match_score(self.match)
             mock_send.assert_not_called()
 
+    def test_match_score_refetches_from_datastore(self):
+        """match_score should re-fetch the match from Datastore to get latest data
+        (e.g. score_breakdown that arrived after the task was enqueued)."""
+        # Update the match in Datastore with a score breakdown
+        self.match.score_breakdown_json = json.dumps(
+            {
+                "red": {"auto": 20, "teleop": 54},
+                "blue": {"auto": 30, "teleop": 27},
+            }
+        )
+        self.match.put()
+
+        # Create a stale copy without the breakdown (simulates pickled task payload)
+        stale_match = Match(
+            id=self.match.key.id(),
+            event=self.match.event,
+            comp_level="qm",
+            set_number=1,
+            match_number=1,
+            team_key_names=["frc7332"],
+            alliances_json=self.match.alliances_json,
+            year=2020,
+            # No score_breakdown_json
+        )
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.match_score(stale_match, "user_id")
+            # Verify the notification was created with the fresh match (which has breakdown)
+            assert mock_send.call_count == 3
+            notification = mock_send.call_args_list[0][0][1]
+            assert isinstance(notification, MatchScoreNotification)
+            assert notification.match.score_breakdown is not None
+
     def test_match_score_user_id(self):
         # Set some upcoming matches for the Event
         match_creator = MatchTestCreator(self.event)
